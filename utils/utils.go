@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -129,18 +130,7 @@ func PrepareLocalPathForUpload(localPath string, useRegExp bool) string {
 	} else if strings.HasPrefix(localPath, ".\\") {
 		localPath = localPath[3:]
 	}
-	slash := string(os.PathSeparator)
-	splitLocalPath, filterLocalPath := strings.Split(localPath, slash), []string{}
-	for index := 0; index < len(splitLocalPath); index++ {
-		if splitLocalPath[index] == ".." {
-			if len(filterLocalPath) > 1 {
-				filterLocalPath = filterLocalPath[:len(filterLocalPath)-1]
-			}
-		} else {
-			filterLocalPath = append(filterLocalPath, splitLocalPath[index])
-		}
-	}
-	localPath = strings.Join(filterLocalPath, slash)
+	localPath = filepath.Clean(localPath)
 	if !useRegExp {
 		localPath = pathToRegExp(localPath)
 	}

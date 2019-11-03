@@ -1,18 +1,22 @@
 package services
 
 import (
+	"path/filepath"
+	"strconv"
+	"testing"
+
 	"github.com/jfrog/jfrog-client-go/bintray/services/utils/tests"
 	"github.com/jfrog/jfrog-client-go/bintray/services/versions"
 	"github.com/jfrog/jfrog-client-go/httpclient"
 	testsutils "github.com/jfrog/jfrog-client-go/tests"
-	"path/filepath"
-	"strconv"
-	"testing"
 	"github.com/jfrog/jfrog-client-go/utils/log"
 )
 
-func TestSingleFileUpload(t *testing.T) {
+func init() {
 	log.SetLogger(log.NewLogger(log.DEBUG, nil))
+}
+
+func TestSingleFileUpload(t *testing.T) {
 	uploadService, err := newDryRunUploadService()
 	if err != nil {
 		t.Error(err.Error())
