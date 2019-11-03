@@ -80,7 +80,7 @@ func TestPrepareLocalPathForUpload(t *testing.T) {
 	}
 	parameter = filepath.FromSlash("/foo/bar/")
 	got = PrepareLocalPathForUpload(parameter, false)
-	want = filepath.FromSlash("^/foo/bar$")
+	want = filepath.FromSlash("^/foo/bar/.*$")
 	if got != want {
 		t.Errorf("PrepareLocalPathForUpload(%s) == %s, want %s", parameter, got, want)
 	}
@@ -92,7 +92,7 @@ func TestPrepareLocalPathForUpload(t *testing.T) {
 	}
 	parameter = filepath.FromSlash("./foo/bar/")
 	got = PrepareLocalPathForUpload(parameter, false)
-	want = filepath.FromSlash("^foo/bar$")
+	want = filepath.FromSlash("^foo/bar/.*$")
 	if got != want {
 		t.Errorf("PrepareLocalPathForUpload(%s) == %s, want %s", parameter, got, want)
 	}
