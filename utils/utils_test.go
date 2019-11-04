@@ -1,7 +1,9 @@
 package utils
 
-import "testing"
-import "reflect"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestRemoveRepoFromPath(t *testing.T) {
 	assertRemoveRepoFromPath("repo/abc/def", "/abc/def", t)

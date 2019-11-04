@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/jfrog/jfrog-client-go/utils"
 )
 
 // Returns an AQL body string to search file in Artifactory by pattern, according the the specified arguments requirements.
 func createAqlBodyForSpecWithPattern(params *ArtifactoryCommonParams) (string, error) {
-	searchPattern := prepareSearchPattern(params.Pattern, true)
+	searchPattern := prepareSourceSearchPattern(params.Pattern, params.Target, true)
 	pathFilePairs := createRepoPathFileTriples(searchPattern, params.Recursive)
 	includeRoot := strings.Count(searchPattern, "/") < 2
 	pathPairsSize := len(pathFilePairs)
@@ -100,11 +102,22 @@ func CreateAqlQueryForNpm(npmName, npmVersion string) string {
 	return fmt.Sprintf(itemsPart, npmName, npmVersion, buildIncludeQueryPart([]string{"name", "repo", "path", "actual_sha1", "actual_md5"}))
 }
 
-func prepareSearchPattern(pattern string, repositoryExists bool) string {
-	if strings.HasSuffix(pattern, "/") || (pattern == "" && repositoryExists) {
-		pattern += "*"
-	}
+func CreateAqlQueryForPypi(repo, file string) string {
+	itemsPart :=
+		`items.find({` +
+			`"repo": "%s",` +
+			`"$or": [{` +
+			`"$and":[{` +
+			`"path": {"$match": "*"},` +
+			`"name": {"$match": "%s"}` +
+			`}]` +
+			`}]` +
+			`})%s`
+	return fmt.Sprintf(itemsPart, repo, file, buildIncludeQueryPart([]string{"name", "repo", "path", "actual_md5", "actual_sha1"}))
+}
 
+func prepareSearchPattern(pattern string, repositoryExists bool) string {
+	addWildcardIfNeeded(&pattern, repositoryExists)
 	// Remove parenthesis
 	pattern = strings.Replace(pattern, "(", "", -1)
 	pattern = strings.Replace(pattern, ")", "", -1)
@@ -312,4 +325,16 @@ func getAqlValue(val string) string {
 		aqlValuePattern = `"%s"`
 	}
 	return fmt.Sprintf(aqlValuePattern, val)
+}
+
+func prepareSourceSearchPattern(pattern, target string, repositoryExists bool) string {
+	addWildcardIfNeeded(&pattern, repositoryExists)
+	pattern = utils.RemovePlaceholderParentheses(pattern, target)
+	return pattern
+}
+
+func addWildcardIfNeeded(pattern *string, repositoryExists bool) {
+	if strings.HasSuffix(*pattern, "/") || (*pattern == "" && repositoryExists) {
+		*pattern += "*"
+	}
 }
