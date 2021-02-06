@@ -546,13 +546,8 @@ func validateRepoConfig(t *testing.T, repoKey string, params interface{}) {
 		ErrorMessage:     "Waiting for Artifactory to evaluate repository operation...",
 		ExecutionHandler: createRepoConfigValidationFunc(repoKey, params),
 	}
-	for i := 0; i < 3; i++ {
-		err := retryExecutor.Execute()
-		assert.NoError(t, err)
-		if err != nil {
-			break
-		}
-	}
+	err := retryExecutor.Execute()
+	assert.NoError(t, err)
 
 }
 
