@@ -1,12 +1,14 @@
 package services
 
 import (
-	biutils "github.com/jfrog/build-info-go/utils"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"sort"
+
+	"github.com/jfrog/build-info-go/entities"
+	biutils "github.com/jfrog/build-info-go/utils"
 
 	"github.com/jfrog/jfrog-client-go/http/httpclient"
 	"github.com/jfrog/jfrog-client-go/utils/version"
@@ -344,7 +346,7 @@ func createDependencyTransferDetails(downloadPath, localPath, localFileName stri
 func createDependencyArtifactDetails(resultItem utils.ResultItem) utils.ArtifactDetails {
 	fileInfo := utils.ArtifactDetails{
 		ArtifactoryPath: resultItem.GetItemRelativePath(),
-		Checksums: utils.Checksums{
+		Checksums: entities.Checksum{
 			Sha1: resultItem.Actual_Sha1,
 			Md5:  resultItem.Actual_Md5,
 		},
