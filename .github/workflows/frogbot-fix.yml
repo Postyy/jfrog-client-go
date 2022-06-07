@@ -1,8 +1,6 @@
 name: "Frogbot Fix"
 on:
-  push:
-    branches:
-      - 'dev'
+  push
 jobs:
   frogbot:
     runs-on: ubuntu-latest
