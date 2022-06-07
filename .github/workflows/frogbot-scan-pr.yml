@@ -10,7 +10,9 @@ jobs:
     environment: frogbot
     steps:
 
-
+      - uses: actions/checkout@v3
+        with:
+          ref: $GITHUB_SHA
       # Install prerequisites
       - name: Setup Go
         uses: actions/setup-go@v3
