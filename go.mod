@@ -15,6 +15,7 @@ require (
 	github.com/xanzy/ssh-agent v0.3.1
 	golang.org/x/crypto v0.0.0-20220314234659-1baeb1ce4c0b
 	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1
+	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 )
 
 require (
@@ -57,4 +58,4 @@ exclude (
 
 // replace github.com/jfrog/build-info-go => github.com/jfrog/build-info-go v1.2.6-0.20220501062728-3ce03e0924b3
 
-// replace github.com/jfrog/gofrog => github.com/jfrog/gofrog v1.0.7-0.20211128152632-e218c460d703
+replace github.com/jfrog/gofrog => github.com/gailazar300/gofrog v1.0.7-0.20220606092440-7016666a6043
