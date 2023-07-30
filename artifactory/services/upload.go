@@ -3,6 +3,16 @@ package services
 import (
 	"archive/zip"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+	"regexp"
+	"sort"
+	"strconv"
+	"strings"
+	"sync"
+
 	"github.com/jfrog/build-info-go/entities"
 	biutils "github.com/jfrog/build-info-go/utils"
 	"github.com/jfrog/gofrog/parallel"
@@ -17,15 +27,6 @@ import (
 	"github.com/jfrog/jfrog-client-go/utils/io/fileutils"
 	"github.com/jfrog/jfrog-client-go/utils/io/httputils"
 	"github.com/jfrog/jfrog-client-go/utils/log"
-	"io"
-	"net/http"
-	"os"
-	"path/filepath"
-	"regexp"
-	"sort"
-	"strconv"
-	"strings"
-	"sync"
 )
 
 type UploadService struct {
@@ -310,7 +311,7 @@ func scanFilesByPattern(uploadParams UploadParams, rootPath string, progressMgr 
 	if errorutils.CheckError(err) != nil {
 		return err
 	}
-	paths, err := fspatterns.ListFiles(rootPath, uploadParams.IsRecursive(), uploadParams.IsIncludeDirs(), uploadParams.IsSymlink(), excludePathPattern)
+	paths, err := fspatterns.ListFiles(rootPath, uploadParams.IsRecursive(), uploadParams.IsIncludeDirs(), uploadParams.IsSymlink(), excludePathPattern, uploadParams.IsAntExcludeContentOnly())
 	if err != nil {
 		return err
 	}
@@ -653,17 +654,17 @@ func getDebianProps(debianPropsStr string) string {
 
 type UploadParams struct {
 	*utils.CommonParams
-	Deb                  string
-	BuildProps           string
-	Symlink              bool
-	ExplodeArchive       bool
-	Flat                 bool
-	AddVcsProps          bool
-	MinChecksumDeploy    int64
-	ChecksumsCalcEnabled bool
-	Archive              string
-	// When using the 'archive' option for upload, we can control the target path inside the uploaded archive using placeholders. This operation determines the TargetPathInArchive value.
-	TargetPathInArchive string
+	Deb                   string
+	BuildProps            string
+	Symlink               bool
+	ExplodeArchive        bool
+	Flat                  bool
+	AddVcsProps           bool
+	MinChecksumDeploy     int64
+	ChecksumsCalcEnabled  bool
+	Archive               string
+	TargetPathInArchive   string // When using the 'archive' option for upload, we can control the target path inside the uploaded archive using placeholders. This operation determines the TargetPathInArchive value.
+	AntExcludeContentOnly bool
 }
 
 func NewUploadParams() UploadParams {
@@ -695,6 +696,10 @@ func (up *UploadParams) IsExplodeArchive() bool {
 
 func (up *UploadParams) GetDebian() string {
 	return up.Deb
+}
+
+func (up *UploadParams) IsAntExcludeContentOnly() bool {
+	return up.AntExcludeContentOnly
 }
 
 type UploadData struct {

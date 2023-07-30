@@ -17,7 +17,7 @@ func TestFilterFiles(t *testing.T) {
 		{[]string{"file1", filepath.Join("dir", "file1"), "file2.zip"}, "^*.zip$", []string{"file1", filepath.Join("dir", "file1")}},
 	}
 	for _, d := range data {
-		got, err := filterFiles(d.files, d.ExcludePattern)
+		got, err := filterFiles(d.files, d.ExcludePattern, false)
 		assert.NoError(t, err)
 		assert.Len(t, got, len(d.result))
 		assert.Contains(t, got, d.files[0])

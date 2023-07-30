@@ -19,29 +19,30 @@ type Aql struct {
 }
 
 type CommonParams struct {
-	Aql              Aql
-	Pattern          string
-	Exclusions       []string
-	Target           string
-	Props            string
-	TargetProps      *Properties
-	ExcludeProps     string
-	SortOrder        string
-	SortBy           []string
-	Offset           int
-	Limit            int
-	Build            string
-	Project          string
-	ExcludeArtifacts bool
-	IncludeDeps      bool
-	Bundle           string
-	Recursive        bool
-	IncludeDirs      bool
-	Regexp           bool
-	Ant              bool
-	ArchiveEntries   string
-	Transitive       bool
-	Include          []string
+	Aql                   Aql
+	Pattern               string
+	Exclusions            []string
+	Target                string
+	Props                 string
+	TargetProps           *Properties
+	ExcludeProps          string
+	SortOrder             string
+	SortBy                []string
+	Offset                int
+	Limit                 int
+	Build                 string
+	Project               string
+	ExcludeArtifacts      bool
+	IncludeDeps           bool
+	Bundle                string
+	Recursive             bool
+	IncludeDirs           bool
+	Regexp                bool
+	Ant                   bool
+	ArchiveEntries        string
+	Transitive            bool
+	Include               []string
+	AntExcludeContentOnly bool
 }
 
 type FileGetter interface {

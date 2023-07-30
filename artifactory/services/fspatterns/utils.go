@@ -16,7 +16,7 @@ import (
 )
 
 // Return all the existing paths of the provided root path
-func ListFiles(rootPath string, isRecursive, includeDirs, isSymlink bool, excludePathPattern string) ([]string, error) {
+func ListFiles(rootPath string, isRecursive, includeDirs, isSymlink bool, excludePathPattern string, antExcludeContentOnly bool) ([]string, error) {
 	var paths []string
 	var err error
 	if isRecursive {
@@ -27,7 +27,7 @@ func ListFiles(rootPath string, isRecursive, includeDirs, isSymlink bool, exclud
 	if err != nil {
 		return paths, err
 	}
-	return filterFiles(paths, excludePathPattern)
+	return filterFiles(paths, excludePathPattern, antExcludeContentOnly)
 }
 
 // Transform to regexp and prepare Exclude patterns to be used
@@ -49,23 +49,42 @@ func PrepareExcludePathPattern(params serviceutils.FileGetter) string {
 	return excludePathPattern
 }
 
-func filterFiles(files []string, excludePathPattern string) (filteredFiles []string, err error) {
-	var excludedPath bool
+func filterFiles(files []string, excludePathPattern string, antExcludeContentOnly bool) (filteredFiles []string, err error) {
+	var re *regexp.Regexp
+	if excludePathPattern != "" {
+		re = regexp.MustCompile(excludePathPattern)
+	}
 	for i := 0; i < len(files); i++ {
 		if files[i] == "." {
 			continue
 		}
-		excludedPath, err = isPathExcluded(files[i], excludePathPattern)
-		if err != nil {
-			return
-		}
-		if !excludedPath {
-			filteredFiles = append(filteredFiles, files[i])
-		} else {
+		if isExcludedPath(files[i], re, antExcludeContentOnly) {
 			log.Debug(fmt.Sprintf("The path '%s' is excluded", files[i]))
+		} else {
+			filteredFiles = append(filteredFiles, files[i])
 		}
 	}
 	return
+}
+
+func isExcludedPath(filePath string, re *regexp.Regexp, antExcludeContentOnly bool) bool {
+	if re == nil {
+		return false
+	}
+	submatch := re.FindStringSubmatch(filePath)
+	if antExcludeContentOnly {
+		return hasCapturingGroup(submatch)
+	}
+	return len(submatch) > 0
+}
+
+func hasCapturingGroup(submatch []string) bool {
+	for i := 2; i < len(submatch); i++ {
+		if submatch[i] != ""{
+			return true
+		}
+	}
+	return false
 }
 
 // Return the actual sub-paths that match the regex provided.
